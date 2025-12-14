@@ -295,6 +295,30 @@
       "type": "string",
       "oneOf": [
         {
+          "description": "Enables the chat command.",
+          "type": "string",
+          "const": "allow-chat",
+          "markdownDescription": "Enables the chat command."
+        },
+        {
+          "description": "Denies the chat command.",
+          "type": "string",
+          "const": "deny-chat",
+          "markdownDescription": "Denies the chat command."
+        },
+        {
+          "description": "Enables the init_agent command.",
+          "type": "string",
+          "const": "allow-init-agent",
+          "markdownDescription": "Enables the init_agent command."
+        },
+        {
+          "description": "Denies the init_agent command.",
+          "type": "string",
+          "const": "deny-init-agent",
+          "markdownDescription": "Denies the init_agent command."
+        },
+        {
           "description": "Enables the ping command without any pre-configured scope.",
           "type": "string",
           "const": "allow-ping",
@@ -307,10 +331,106 @@
           "markdownDescription": "Denies the ping command without any pre-configured scope."
         },
         {
-          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-ping`",
+          "description": "Enables the stream_chat command.",
+          "type": "string",
+          "const": "allow-stream-chat",
+          "markdownDescription": "Enables the stream_chat command."
+        },
+        {
+          "description": "Denies the stream_chat command.",
+          "type": "string",
+          "const": "deny-stream-chat",
+          "markdownDescription": "Denies the stream_chat command."
+        },
+        {
+          "description": "Enables the submit_tool_output command.",
+          "type": "string",
+          "const": "allow-submit-tool-output",
+          "markdownDescription": "Enables the submit_tool_output command."
+        },
+        {
+          "description": "Denies the submit_tool_output command.",
+          "type": "string",
+          "const": "deny-submit-tool-output",
+          "markdownDescription": "Denies the submit_tool_output command."
+        },
+        {
+          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-init-agent`\n- `allow-chat`\n- `allow-stream-chat`\n- `allow-submit-tool-output`\n- `allow-search-memory`\n- `allow-save-memory`\n- `allow-delete-memory`\n- `allow-list-tasks`\n- `allow-get-task`\n- `allow-cancel-task`\n",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-ping`"
+          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-init-agent`\n- `allow-chat`\n- `allow-stream-chat`\n- `allow-submit-tool-output`\n- `allow-search-memory`\n- `allow-save-memory`\n- `allow-delete-memory`\n- `allow-list-tasks`\n- `allow-get-task`\n- `allow-cancel-task`\n"
+        },
+        {
+          "description": "Enables the search_memory command.",
+          "type": "string",
+          "const": "allow-search-memory",
+          "markdownDescription": "Enables the search_memory command."
+        },
+        {
+          "description": "Denies the search_memory command.",
+          "type": "string",
+          "const": "deny-search-memory",
+          "markdownDescription": "Denies the search_memory command."
+        },
+        {
+          "description": "Enables the save_memory command.",
+          "type": "string",
+          "const": "allow-save-memory",
+          "markdownDescription": "Enables the save_memory command."
+        },
+        {
+          "description": "Denies the save_memory command.",
+          "type": "string",
+          "const": "deny-save-memory",
+          "markdownDescription": "Denies the save_memory command."
+        },
+        {
+          "description": "Enables the delete_memory command.",
+          "type": "string",
+          "const": "allow-delete-memory",
+          "markdownDescription": "Enables the delete_memory command."
+        },
+        {
+          "description": "Denies the delete_memory command.",
+          "type": "string",
+          "const": "deny-delete-memory",
+          "markdownDescription": "Denies the delete_memory command."
+        },
+        {
+          "description": "Enables the list_tasks command.",
+          "type": "string",
+          "const": "allow-list-tasks",
+          "markdownDescription": "Enables the list_tasks command."
+        },
+        {
+          "description": "Denies the list_tasks command.",
+          "type": "string",
+          "const": "deny-list-tasks",
+          "markdownDescription": "Denies the list_tasks command."
+        },
+        {
+          "description": "Enables the get_task command.",
+          "type": "string",
+          "const": "allow-get-task",
+          "markdownDescription": "Enables the get_task command."
+        },
+        {
+          "description": "Denies the get_task command.",
+          "type": "string",
+          "const": "deny-get-task",
+          "markdownDescription": "Denies the get_task command."
+        },
+        {
+          "description": "Enables the cancel_task command.",
+          "type": "string",
+          "const": "allow-cancel-task",
+          "markdownDescription": "Enables the cancel_task command."
+        },
+        {
+          "description": "Denies the cancel_task command.",
+          "type": "string",
+          "const": "deny-cancel-task",
+          "markdownDescription": "Denies the cancel_task command."
         }
       ]
     }
