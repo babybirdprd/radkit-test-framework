@@ -1,3 +1,8 @@
 [default]
 description = "Default permissions for the plugin"
-permissions = ["allow-ping"]
+permissions = [
+    "allow-init-agent",
+    "allow-chat",
+    "allow-stream-chat",
+    "allow-submit-tool-output"
+]

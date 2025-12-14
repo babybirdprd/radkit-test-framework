@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-init-agent"
+description = "Enables the init_agent command."
+commands.allow = ["init_agent"]
+
+[[permission]]
+identifier = "deny-init-agent"
+description = "Denies the init_agent command."
+commands.deny = ["init_agent"]

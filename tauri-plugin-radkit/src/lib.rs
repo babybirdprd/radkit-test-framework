@@ -4,44 +4,28 @@ use tauri::{
 };
 
 pub use models::*;
-
-#[cfg(desktop)]
-mod desktop;
-#[cfg(mobile)]
-mod mobile;
+use runtime_holder::RadkitRuntimeState;
 
 mod commands;
 mod error;
 mod models;
+mod runtime_holder;
+mod frontend_tool;
+mod chat_skill;
 
 pub use error::{Error, Result};
-
-#[cfg(desktop)]
-use desktop::Radkit;
-#[cfg(mobile)]
-use mobile::Radkit;
-
-/// Extensions to [`tauri::App`], [`tauri::AppHandle`] and [`tauri::Window`] to access the radkit APIs.
-pub trait RadkitExt<R: Runtime> {
-  fn radkit(&self) -> &Radkit<R>;
-}
-
-impl<R: Runtime, T: Manager<R>> crate::RadkitExt<R> for T {
-  fn radkit(&self) -> &Radkit<R> {
-    self.state::<Radkit<R>>().inner()
-  }
-}
 
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
   Builder::new("radkit")
-    .invoke_handler(tauri::generate_handler![commands::ping])
-    .setup(|app, api| {
-      #[cfg(mobile)]
-      let radkit = mobile::init(app, api)?;
-      #[cfg(desktop)]
-      let radkit = desktop::init(app, api)?;
-      app.manage(radkit);
+    .invoke_handler(tauri::generate_handler![
+        commands::init_agent,
+        commands::chat,
+        commands::stream_chat,
+        commands::submit_tool_output
+    ])
+    .setup(|app, _api| {
+      app.manage(RadkitRuntimeState::new());
       Ok(())
     })
     .build()
