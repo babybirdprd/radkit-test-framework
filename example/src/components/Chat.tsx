@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
+import { listen } from "@tauri-apps/api/event";
 import { api } from "../api";
+import { recorder } from "../stores/recorder";
 
 interface Message {
     role: "user" | "assistant" | "system" | "tool";
@@ -22,51 +24,78 @@ export function Chat({ taskId, onTaskCreated, isInitialized }: ChatProps) {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
+    useEffect(() => {
+        const handleStreamPayload = (payload: any) => {
+            let task = payload.Task || payload.task || (payload.kind === "task_update" ? payload.task : undefined);
+
+            if (!task && payload.task_id && payload.history) {
+                task = payload;
+            }
+
+            if (task) {
+                 if (task.history) {
+                     const msgs: Message[] = task.history.map((h: any) => {
+                         let content = "";
+                         if (h.parts) {
+                             h.parts.forEach((p: any) => {
+                                 if (p.text) content += p.text;
+                             });
+                         }
+                         return { role: h.role.toLowerCase(), content };
+                     });
+                     setMessages(msgs);
+                 }
+
+                 if (task.status === "completed" || task.status === "failed") {
+                     setLoading(false);
+                 }
+
+                 if (task.task_id && !taskId) {
+                     onTaskCreated(task.task_id);
+                 }
+            }
+        };
+
+        const unlistenPromise = listen("stream_event", (event: any) => {
+            recorder.logEvent("stream", event.payload);
+            handleStreamPayload(event.payload);
+        });
+
+        const unlistenPlayback = listen("playback_event", (event: any) => {
+             const entry = event.payload;
+             if (entry.type === "prompt") {
+                 setMessages(prev => [...prev, { role: "user", content: entry.data.content }]);
+             } else if (entry.type === "stream") {
+                 handleStreamPayload(entry.data);
+             }
+        });
+
+        const unlistenStart = listen("playback_start", () => {
+             setMessages([]);
+        });
+
+        return () => {
+            unlistenPromise.then(f => f());
+            unlistenPlayback.then(f => f());
+            unlistenStart.then(f => f());
+        };
+    }, [taskId, onTaskCreated]);
+
     const sendMessage = async () => {
         if (!input.trim() || loading) return;
         const userMsg = input;
         setInput("");
         setMessages(prev => [...prev, { role: "user", content: userMsg }]);
         setLoading(true);
+        recorder.logEvent("prompt", { content: userMsg });
 
         try {
-            const response: any = await api.chat(userMsg, undefined, taskId);
-
-            let msgContent = "";
-            let newTaskId = taskId;
-
-             if (response.Task) {
-                const task = response.Task;
-                newTaskId = task.task_id;
-                 const history = task.history;
-                 if (history && history.length > 0) {
-                      const last = history[history.length - 1];
-                      if (last.parts) {
-                           last.parts.forEach((p: any) => {
-                               if (p.text) msgContent += p.text;
-                           });
-                       }
-                 }
-            } else if (response.Message) {
-                const msg = response.Message;
-                 if (msg.parts) {
-                    msg.parts.forEach((p: any) => {
-                        if (p.text) msgContent += p.text;
-                    });
-                }
-            }
-
-            if (!taskId && newTaskId) {
-                onTaskCreated(newTaskId);
-            }
-
-            if (msgContent) {
-                 setMessages(prev => [...prev, { role: "assistant", content: msgContent }]);
-            }
+            await api.streamChat(userMsg, undefined, taskId);
+            // Loading state will be handled by stream events
         } catch (e) {
             console.error(e);
+            recorder.logEvent("error", String(e));
             setMessages(prev => [...prev, { role: "system", content: "Error: " + String(e) }]);
-        } finally {
             setLoading(false);
         }
     };

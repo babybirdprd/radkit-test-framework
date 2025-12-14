@@ -5,6 +5,8 @@ import { Sidebar } from "./components/Sidebar";
 import { Chat } from "./components/Chat";
 import { Settings } from "./components/Settings";
 import { StateViewer } from "./components/StateViewer";
+import { RecorderControls } from "./components/RecorderControls";
+import { recorder } from "./stores/recorder";
 import "./App.css";
 
 function App() {
@@ -16,9 +18,25 @@ function App() {
     const addLog = (msg: string) => setLogs(prev => [...prev, msg]);
 
     useEffect(() => {
+        const unlistenPlayback = listen("playback_event", (event: any) => {
+             const entry = event.payload;
+             if (entry.type === "tool_call") {
+                 const { name, args } = entry.data;
+                 addLog(`[Playback] Tool Request: ${name} with args ${JSON.stringify(args)}`);
+             } else if (entry.type === "tool_output") {
+                 addLog(`[Playback] Tool Result submitted`);
+             }
+        });
+
+        const unlistenStart = listen("playback_start", () => {
+             setLogs([]);
+             addLog("[Playback] Session started");
+        });
+
         const unlistenPromise = listen("tool_execution_request", async (event: any) => {
             const { requestId, name, args } = event.payload;
             addLog(`Tool Request: ${name} with args ${JSON.stringify(args)}`);
+            recorder.logEvent("tool_call", { name, args, requestId });
 
             let result;
             let isError = false;
@@ -54,6 +72,7 @@ function App() {
             }
 
             try {
+                recorder.logEvent("tool_output", { requestId, result, isError });
                 await api.submitToolOutput({
                     requestId,
                     result,
@@ -67,6 +86,8 @@ function App() {
 
         return () => {
             unlistenPromise.then(f => f());
+            unlistenPlayback.then(f => f());
+            unlistenStart.then(f => f());
         };
     }, []);
 
@@ -100,6 +121,10 @@ function App() {
                         <StateViewer />
                     </>
                 )}
+            </div>
+
+            <div className="fixed top-4 right-4 z-50">
+                <RecorderControls />
             </div>
 
             <div className="fixed bottom-4 right-4">
