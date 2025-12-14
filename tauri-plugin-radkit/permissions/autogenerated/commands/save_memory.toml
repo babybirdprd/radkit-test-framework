@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-save-memory"
+description = "Enables the save_memory command."
+commands.allow = ["save_memory"]
+
+[[permission]]
+identifier = "deny-save-memory"
+description = "Denies the save_memory command."
+commands.deny = ["save_memory"]

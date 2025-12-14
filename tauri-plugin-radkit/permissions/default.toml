@@ -4,5 +4,11 @@ permissions = [
     "allow-init-agent",
     "allow-chat",
     "allow-stream-chat",
-    "allow-submit-tool-output"
+    "allow-submit-tool-output",
+    "allow-search-memory",
+    "allow-save-memory",
+    "allow-delete-memory",
+    "allow-list-tasks",
+    "allow-get-task",
+    "allow-cancel-task"
 ]

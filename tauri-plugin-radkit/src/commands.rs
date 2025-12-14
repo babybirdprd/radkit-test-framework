@@ -14,7 +14,7 @@ use radkit::runtime::memory::{MemoryContent, SearchOptions};
 use radkit::runtime::context::AuthContext;
 
 use a2a_types::{
-    MessageSendParams, Message, MessageRole, Part, TaskQueryParams
+    MessageSendParams, Message, MessageRole, Part, TaskQueryParams, TaskIdParams
 };
 use a2a_client::A2AClient;
 
@@ -380,5 +380,18 @@ pub async fn get_task(
          task_id: request.task_id,
     };
     let task = client.get_task(params).await.map_err(|e| e.to_string())?;
+    Ok(serde_json::to_value(task).map_err(|e| e.to_string())?)
+}
+
+#[tauri::command]
+pub async fn cancel_task(
+    state: State<'_, RadkitRuntimeState>,
+    request: CancelTaskRequest,
+) -> Result<serde_json::Value, String> {
+    let client = get_client(&state)?;
+    let params = TaskIdParams {
+         task_id: request.task_id,
+    };
+    let task = client.cancel_task(params).await.map_err(|e| e.to_string())?;
     Ok(serde_json::to_value(task).map_err(|e| e.to_string())?)
 }

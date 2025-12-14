@@ -54,6 +54,10 @@ export interface GetTaskRequest {
     taskId: string;
 }
 
+export interface CancelTaskRequest {
+    taskId: string;
+}
+
 export const api = {
   initAgent: (config: InitAgentRequest) => invoke("plugin:radkit|init_agent", { config }),
   chat: (message: string, contextId?: string, taskId?: string) => invoke("plugin:radkit|chat", { message, contextId, taskId }),
@@ -64,4 +68,5 @@ export const api = {
   deleteMemory: (id: string) => invoke<boolean>("plugin:radkit|delete_memory", { request: { id } }),
   listTasks: (contextId?: string) => invoke<any[]>("plugin:radkit|list_tasks", { request: { contextId } }),
   getTask: (taskId: string) => invoke<any>("plugin:radkit|get_task", { request: { taskId } }),
+  cancelTask: (taskId: string) => invoke<any>("plugin:radkit|cancel_task", { request: { taskId } }),
 };

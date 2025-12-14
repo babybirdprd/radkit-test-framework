@@ -27,7 +27,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         commands::save_memory,
         commands::delete_memory,
         commands::list_tasks,
-        commands::get_task
+        commands::get_task,
+        commands::cancel_task
     ])
     .setup(|app, _api| {
       app.manage(RadkitRuntimeState::new());

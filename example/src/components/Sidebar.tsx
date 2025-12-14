@@ -24,6 +24,19 @@ export function Sidebar({ onSelectThread, currentThreadId }: SidebarProps) {
         return () => clearInterval(interval);
     }, []);
 
+    const deleteTask = async (e: React.MouseEvent, taskId: string) => {
+        e.stopPropagation();
+        if (confirm("Delete task?")) {
+            try {
+                await api.cancelTask(taskId);
+                refreshTasks();
+                if (currentThreadId === taskId) onSelectThread(undefined);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
     return (
         <div className="w-64 bg-gray-900 text-white flex flex-col border-r border-gray-700 h-full">
             <div className="p-4 border-b border-gray-700">
@@ -43,7 +56,10 @@ export function Sidebar({ onSelectThread, currentThreadId }: SidebarProps) {
                         className={`p-3 border-b border-gray-800 cursor-pointer hover:bg-gray-800 ${currentThreadId === task.task_id ? "bg-gray-800" : ""}`}
                         onClick={() => onSelectThread(task.task_id)}
                     >
-                        <div className="text-sm font-medium truncate">{task.task_id}</div>
+                        <div className="flex justify-between items-center">
+                             <div className="text-sm font-medium truncate w-32">{task.task_id}</div>
+                             <button onClick={(e) => deleteTask(e, task.task_id)} className="text-red-500 hover:text-red-300 px-2 font-bold">×</button>
+                        </div>
                         <div className="text-xs text-gray-400">{task.status}</div>
                     </div>
                 ))}

@@ -9,6 +9,13 @@ Default permissions for the plugin
 - `allow-stream-chat`
 - `allow-submit-tool-output`
 
+- `allow-search-memory`
+- `allow-save-memory`
+- `allow-delete-memory`
+- `allow-list-tasks`
+- `allow-get-task`
+- `allow-cancel-task`
+
 ## Permission Table
 
 <table>
@@ -148,3 +155,159 @@ Denies the submit_tool_output command.
 </td>
 </tr>
 </table>
+
+<tr>
+<td>
+
+`radkit:allow-search-memory`
+
+</td>
+<td>
+
+Enables the search_memory command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:deny-search-memory`
+
+</td>
+<td>
+
+Denies the search_memory command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:allow-save-memory`
+
+</td>
+<td>
+
+Enables the save_memory command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:deny-save-memory`
+
+</td>
+<td>
+
+Denies the save_memory command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:allow-delete-memory`
+
+</td>
+<td>
+
+Enables the delete_memory command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:deny-delete-memory`
+
+</td>
+<td>
+
+Denies the delete_memory command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:allow-list-tasks`
+
+</td>
+<td>
+
+Enables the list_tasks command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:deny-list-tasks`
+
+</td>
+<td>
+
+Denies the list_tasks command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:allow-get-task`
+
+</td>
+<td>
+
+Enables the get_task command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:deny-get-task`
+
+</td>
+<td>
+
+Denies the get_task command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:allow-cancel-task`
+
+</td>
+<td>
+
+Enables the cancel_task command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`radkit:deny-cancel-task`
+
+</td>
+<td>
+
+Denies the cancel_task command.
+
+</td>
+</tr>

@@ -131,3 +131,9 @@ pub struct ListTasksRequest {
 pub struct GetTaskRequest {
     pub task_id: String,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CancelTaskRequest {
+    pub task_id: String,
+}
