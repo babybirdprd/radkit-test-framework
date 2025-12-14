@@ -4,10 +4,10 @@
 
 [[permission]]
 identifier = "allow-stream-chat"
-description = "Enables the stream_chat command."
+description = "Enables the stream_chat command without any pre-configured scope."
 commands.allow = ["stream_chat"]
 
 [[permission]]
 identifier = "deny-stream-chat"
-description = "Denies the stream_chat command."
+description = "Denies the stream_chat command without any pre-configured scope."
 commands.deny = ["stream_chat"]

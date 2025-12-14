@@ -4,10 +4,10 @@
 
 [[permission]]
 identifier = "allow-init-agent"
-description = "Enables the init_agent command."
+description = "Enables the init_agent command without any pre-configured scope."
 commands.allow = ["init_agent"]
 
 [[permission]]
 identifier = "deny-init-agent"
-description = "Denies the init_agent command."
+description = "Denies the init_agent command without any pre-configured scope."
 commands.deny = ["init_agent"]
