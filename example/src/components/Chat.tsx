@@ -25,16 +25,9 @@ export function Chat({ taskId, onTaskCreated, isInitialized }: ChatProps) {
     }, [messages]);
 
     useEffect(() => {
-        const unlistenPromise = listen("stream_event", (event: any) => {
-            const payload = event.payload;
-            recorder.logEvent("stream", payload);
-
-            // Handle Task updates
-            // Determine if payload is Task or wraps it
-            // Adjust based on actual event structure from radkit/a2a
+        const handleStreamPayload = (payload: any) => {
             let task = payload.Task || payload.task || (payload.kind === "task_update" ? payload.task : undefined);
 
-            // If payload IS a Task (duck typing)
             if (!task && payload.task_id && payload.history) {
                 task = payload;
             }
@@ -57,15 +50,34 @@ export function Chat({ taskId, onTaskCreated, isInitialized }: ChatProps) {
                      setLoading(false);
                  }
 
-                 // Notify parent of new task ID if needed
                  if (task.task_id && !taskId) {
                      onTaskCreated(task.task_id);
                  }
             }
+        };
+
+        const unlistenPromise = listen("stream_event", (event: any) => {
+            recorder.logEvent("stream", event.payload);
+            handleStreamPayload(event.payload);
+        });
+
+        const unlistenPlayback = listen("playback_event", (event: any) => {
+             const entry = event.payload;
+             if (entry.type === "prompt") {
+                 setMessages(prev => [...prev, { role: "user", content: entry.data.content }]);
+             } else if (entry.type === "stream") {
+                 handleStreamPayload(entry.data);
+             }
+        });
+
+        const unlistenStart = listen("playback_start", () => {
+             setMessages([]);
         });
 
         return () => {
             unlistenPromise.then(f => f());
+            unlistenPlayback.then(f => f());
+            unlistenStart.then(f => f());
         };
     }, [taskId, onTaskCreated]);
 

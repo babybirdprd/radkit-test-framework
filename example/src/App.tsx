@@ -18,6 +18,21 @@ function App() {
     const addLog = (msg: string) => setLogs(prev => [...prev, msg]);
 
     useEffect(() => {
+        const unlistenPlayback = listen("playback_event", (event: any) => {
+             const entry = event.payload;
+             if (entry.type === "tool_call") {
+                 const { name, args } = entry.data;
+                 addLog(`[Playback] Tool Request: ${name} with args ${JSON.stringify(args)}`);
+             } else if (entry.type === "tool_output") {
+                 addLog(`[Playback] Tool Result submitted`);
+             }
+        });
+
+        const unlistenStart = listen("playback_start", () => {
+             setLogs([]);
+             addLog("[Playback] Session started");
+        });
+
         const unlistenPromise = listen("tool_execution_request", async (event: any) => {
             const { requestId, name, args } = event.payload;
             addLog(`Tool Request: ${name} with args ${JSON.stringify(args)}`);
@@ -71,6 +86,8 @@ function App() {
 
         return () => {
             unlistenPromise.then(f => f());
+            unlistenPlayback.then(f => f());
+            unlistenStart.then(f => f());
         };
     }, []);
 
