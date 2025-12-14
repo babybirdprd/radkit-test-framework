@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import "./App.css";
@@ -15,8 +15,18 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [logs, setLogs] = useState<string[]>([]);
+  const [showLogs, setShowLogs] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const addLog = (msg: string) => setLogs(prev => [...prev, msg]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     const unlistenPromise = listen("tool_execution_request", async (event: any) => {
@@ -37,7 +47,7 @@ function App() {
             if (args.op === "*") val = a * b;
             if (args.op === "/") val = a / b;
 
-            result = { result: val }; // Return object as JSON
+            result = { result: val };
             addLog(`Tool Result: ${val}`);
         } catch (e) {
             result = String(e);
@@ -53,7 +63,7 @@ function App() {
         await invoke("plugin:radkit|submit_tool_output", {
           payload: {
             requestId,
-            result, // Value type, so object is fine
+            result,
             isError
           }
         });
@@ -62,12 +72,24 @@ function App() {
       }
     });
 
+    const unlistenStream = listen("stream_event", (event: any) => {
+        // Handle streaming events if we use stream_chat
+        // For now logging it
+        // addLog(`Stream Event: ${JSON.stringify(event.payload)}`);
+        // If we implement streaming, we would append to last message here
+    });
+
     return () => {
       unlistenPromise.then(f => f());
+      unlistenStream.then(f => f());
     };
   }, []);
 
   async function initAgent() {
+    if (!apiKey) {
+        addLog("Please enter an API Key");
+        return;
+    }
     try {
       addLog("Initializing agent...");
       await invoke("plugin:radkit|init_agent", {
@@ -105,7 +127,7 @@ function App() {
   }
 
   async function sendMessage() {
-    if (!input) return;
+    if (!input.trim()) return;
     const userMsg = input;
     setMessages(prev => [...prev, { role: "user", content: userMsg }]);
     setInput("");
@@ -117,28 +139,32 @@ function App() {
       });
 
       console.log("Response:", response);
-      addLog("Response received");
-
-      // Parse response. It might be { "Task": { ... } } or { "Message": { ... } } or just properties if flattened?
-      // Rust enums with serde defaults: { "Variant": content }
 
       let msgContent = "";
 
       if (response.Task) {
           const task = response.Task;
           const history = task.history;
-          // Get last message which should be assistant (unless tool call happened and it's waiting?)
-          // If task state is Completed, last message is likely assistant response.
-          // Or we iterate history.
-
-          // Simple heuristic: find last assistant message that is later than our user message?
-          // Or just take the last message in history.
           if (history && history.length > 0) {
-              const last = history[history.length - 1];
-              if (last.parts) {
-                   last.parts.forEach((p: any) => {
-                       if (p.text) msgContent += p.text;
-                   });
+              // Find the last assistant message
+              const assistantMsgs = history.filter((m: any) => m.role === "Assistant" || m.role === "assistant"); // Check casing
+              if (assistantMsgs.length > 0) {
+                  const last = assistantMsgs[assistantMsgs.length - 1];
+                  if (last.parts) {
+                       last.parts.forEach((p: any) => {
+                           if (p.text) msgContent += p.text;
+                       });
+                  }
+              } else {
+                  // Fallback: just check last message if it's not user
+                  const last = history[history.length - 1];
+                  if (last.role !== "User" && last.role !== "user") {
+                       if (last.parts) {
+                           last.parts.forEach((p: any) => {
+                               if (p.text) msgContent += p.text;
+                           });
+                       }
+                  }
               }
           }
       } else if (response.Message) {
@@ -149,12 +175,14 @@ function App() {
                });
            }
       } else {
-          // Fallback if structure is different
            msgContent = JSON.stringify(response);
       }
 
       if (msgContent) {
         setMessages(prev => [...prev, { role: "assistant", content: msgContent }]);
+      } else {
+        // Maybe tool call?
+        addLog("No text content in response (possibly tool call)");
       }
 
     } catch (e) {
@@ -164,52 +192,81 @@ function App() {
   }
 
   return (
-    <div className="container">
-      <h1>Radkit Tauri Plugin</h1>
+    <div className="app-container">
+      <div className="sidebar">
+        <h2>Radkit Agent</h2>
 
-      <div className="section">
-        <h2>Configuration</h2>
-        <div className="row">
+        <div className="config-group">
+            <label>API Key</label>
             <input
-                placeholder="OpenAI API Key"
+                type="password"
                 value={apiKey}
                 onChange={e => setApiKey(e.target.value)}
-                type="password"
+                placeholder="sk-..."
             />
+        </div>
+
+        <div className="config-group">
+            <label>Model</label>
             <input
-                placeholder="Model (e.g. gpt-4o)"
                 value={model}
                 onChange={e => setModel(e.target.value)}
+                placeholder="gpt-3.5-turbo"
             />
-            <button onClick={initAgent} disabled={isInitialized}>
-                {isInitialized ? "Initialized" : "Init Agent"}
+        </div>
+
+        <button
+            className={`init-btn ${isInitialized ? 'active' : ''}`}
+            onClick={initAgent}
+            disabled={isInitialized}
+        >
+            {isInitialized ? "Agent Active" : "Initialize Agent"}
+        </button>
+
+        <div className="logs-toggle">
+            <button onClick={() => setShowLogs(!showLogs)}>
+                {showLogs ? "Hide Logs" : "Show Logs"}
             </button>
         </div>
+
+        {showLogs && (
+            <div className="logs-panel">
+                {logs.map((log, i) => <div key={i} className="log-entry">{log}</div>)}
+            </div>
+        )}
       </div>
 
-      <div className="section chat-section">
-        <h2>Chat</h2>
-        <div className="chat-window">
+      <div className="chat-area">
+        <div className="messages-list">
+            {messages.length === 0 && (
+                <div className="empty-state">
+                    <h3>Welcome to Radkit</h3>
+                    <p>Enter your API key and initialize the agent to start chatting.</p>
+                </div>
+            )}
             {messages.map((m, i) => (
-                <div key={i} className={`message ${m.role}`}>
-                    <strong>{m.role}:</strong> {m.content}
+                <div key={i} className={`message-wrapper ${m.role}`}>
+                    <div className="message-bubble">
+                        <div className="message-content">{m.content}</div>
+                    </div>
+                    <div className="message-role">{m.role}</div>
                 </div>
             ))}
+            <div ref={messagesEndRef} />
         </div>
-        <div className="input-area">
+
+        <div className="input-box">
             <input
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && sendMessage()}
-                placeholder="Type a message..."
+                placeholder={isInitialized ? "Type your message..." : "Initialize agent first..."}
+                disabled={!isInitialized}
             />
-            <button onClick={sendMessage} disabled={!isInitialized}>Send</button>
+            <button onClick={sendMessage} disabled={!isInitialized || !input.trim()}>
+                Send
+            </button>
         </div>
-      </div>
-
-      <div className="section logs-section">
-        <h2>Logs</h2>
-        <pre className="logs">{logs.join("\n")}</pre>
       </div>
     </div>
   );
