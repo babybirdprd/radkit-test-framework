@@ -22,7 +22,12 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         commands::init_agent,
         commands::chat,
         commands::stream_chat,
-        commands::submit_tool_output
+        commands::submit_tool_output,
+        commands::search_memory,
+        commands::save_memory,
+        commands::delete_memory,
+        commands::list_tasks,
+        commands::get_task
     ])
     .setup(|app, _api| {
       app.manage(RadkitRuntimeState::new());
