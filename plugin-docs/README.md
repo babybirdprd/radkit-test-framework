@@ -16,14 +16,18 @@ The **Radkit Tauri Plugin** enables you to build powerful, AI-driven desktop app
 *   [**Getting Started**](./getting-started.md): Installation and setup guide.
 *   [**API Reference**](./api-reference.md): Detailed API documentation.
 *   [**Guides**](./guides/): In-depth guides for specific features.
+    *   [A2A Concepts](./guides/a2a.md)
     *   [Tooling](./guides/tooling.md)
     *   [Memory](./guides/memory.md)
     *   [Streaming](./guides/streaming.md)
 *   [**Examples**](./examples.md): Common use cases and patterns.
 
-## Architecture
+## Architecture & Concepts
 
 The plugin spawns a local Radkit runtime within your Tauri application. It exposes a set of commands to interact with this runtime, managing the complexity of the A2A protocol and agent lifecycle for you.
+
+*   **Agents & Skills**: The plugin initializes a default "Chat Agent" equipped with a "Chat Skill". You extend this agent's capabilities by defining **Tools** in your frontend.
+*   **A2A Protocol**: All interactions are compliant with the Agent-to-Agent protocol, using Tasks and Contexts to manage state. See the [A2A Guide](./guides/a2a.md) for details.
 
 ## License
 

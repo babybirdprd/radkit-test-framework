@@ -100,3 +100,37 @@ listen("tool_execution_request", async (event) => {
 await chat("Open the calculator for me.");
 // Agent calls "open_app" with { appName: "calculator" }
 ```
+
+## 4. Multi-Step Workflow (A2A Tasks)
+
+Managing a complex goal by using `taskId` to keep the conversation in a specific thread, and using a separate thread for sub-tasks.
+
+```typescript
+import { chat, initAgent } from "tauri-plugin-radkit-api";
+
+// ... initialize agent ...
+
+async function complexResearchTask(topic) {
+  // 1. Start the main task
+  const initialResp = await chat(`I need to research ${topic}. Create a plan.`);
+  const mainTaskId = initialResp.taskId; // The plugin returns the A2A Task ID
+  console.log("Main Task ID:", mainTaskId);
+
+  // 2. Ask the agent to execute step 1
+  // We pass the same mainTaskId to continue the conversation
+  const step1Resp = await chat("Execute step 1 of the plan.", undefined, mainTaskId);
+  console.log("Step 1:", step1Resp.parts[0].text);
+
+  // 3. Spinoff: Create a sub-task for a specific detail (new context/thread)
+  // We don't pass a taskId, so a new one is created.
+  const subTaskResp = await chat(`Summarize this specific article for me: ...`);
+  const subTaskId = subTaskResp.taskId;
+
+  // 4. Report back to main task
+  await chat(
+    `I found this info from the sub-task: ${subTaskResp.parts[0].text}. Proceed to step 2.`,
+    undefined,
+    mainTaskId
+  );
+}
+```

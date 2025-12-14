@@ -2,6 +2,12 @@
 
 Radkit allows you to define "tools" — functions that the AI agent can call. In the context of the Tauri plugin, these tools are executed in your frontend (JavaScript/TypeScript) environment, giving the agent access to the DOM, browser APIs, or Tauri APIs (like file system or clipboard).
 
+## Tools vs. Skills
+
+In Radkit's Rust architecture, capabilities are grouped into "Skills". The Tauri plugin initializes your agent with a pre-configured **Chat Skill**. This skill is designed to orchestrate the use of the **Tools** you define here.
+
+Think of Tools as the way to add "Skills" to your agent from the frontend, without writing Rust code.
+
 ## 1. Defining Tools
 
 You define tools during agent initialization. A tool needs a name, description, and a JSON Schema for its parameters.
