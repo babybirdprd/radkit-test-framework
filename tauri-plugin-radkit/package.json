@@ -1,8 +1,8 @@
 {
   "name": "tauri-plugin-radkit-api",
   "version": "0.1.0",
-  "author": "You",
-  "description": "",
+  "author": "Radkit Contributors",
+  "description": "Tauri plugin API for Radkit, a Rust SDK for building reliable, A2A-native AI agent systems.",
   "type": "module",
   "types": "./dist-js/index.d.ts",
   "main": "./dist-js/index.cjs",

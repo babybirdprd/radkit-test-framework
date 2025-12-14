@@ -1,8 +1,8 @@
 [package]
 name = "tauri-plugin-radkit"
 version = "0.1.0"
-authors = ["You"]
-description = "Tauri plugin for Radkit"
+authors = ["Radkit Contributors"]
+description = "Tauri plugin for Radkit, a Rust SDK for building reliable, A2A-native AI agent systems."
 edition = "2021"
 rust-version = "1.77.2"
 exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
