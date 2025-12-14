@@ -5,6 +5,8 @@ import { Sidebar } from "./components/Sidebar";
 import { Chat } from "./components/Chat";
 import { Settings } from "./components/Settings";
 import { StateViewer } from "./components/StateViewer";
+import { RecorderControls } from "./components/RecorderControls";
+import { recorder } from "./stores/recorder";
 import "./App.css";
 
 function App() {
@@ -19,6 +21,7 @@ function App() {
         const unlistenPromise = listen("tool_execution_request", async (event: any) => {
             const { requestId, name, args } = event.payload;
             addLog(`Tool Request: ${name} with args ${JSON.stringify(args)}`);
+            recorder.logEvent("tool_call", { name, args, requestId });
 
             let result;
             let isError = false;
@@ -54,6 +57,7 @@ function App() {
             }
 
             try {
+                recorder.logEvent("tool_output", { requestId, result, isError });
                 await api.submitToolOutput({
                     requestId,
                     result,
@@ -100,6 +104,10 @@ function App() {
                         <StateViewer />
                     </>
                 )}
+            </div>
+
+            <div className="fixed top-4 right-4 z-50">
+                <RecorderControls />
             </div>
 
             <div className="fixed bottom-4 right-4">
