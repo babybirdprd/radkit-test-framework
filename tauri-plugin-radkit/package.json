@@ -1,8 +1,8 @@
 {
   "name": "tauri-plugin-radkit-api",
   "version": "0.1.0",
-  "author": "You",
-  "description": "",
+  "author": "Radkit Developers",
+  "description": "Tauri plugin for the Radkit library.",
   "type": "module",
   "types": "./dist-js/index.d.ts",
   "main": "./dist-js/index.cjs",

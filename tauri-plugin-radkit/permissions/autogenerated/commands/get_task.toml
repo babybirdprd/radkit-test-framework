@@ -4,10 +4,10 @@
 
 [[permission]]
 identifier = "allow-get-task"
-description = "Enables the get_task command."
+description = "Enables the get_task command without any pre-configured scope."
 commands.allow = ["get_task"]
 
 [[permission]]
 identifier = "deny-get-task"
-description = "Denies the get_task command."
+description = "Denies the get_task command without any pre-configured scope."
 commands.deny = ["get_task"]

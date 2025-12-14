@@ -4,10 +4,10 @@
 
 [[permission]]
 identifier = "allow-chat"
-description = "Enables the chat command."
+description = "Enables the chat command without any pre-configured scope."
 commands.allow = ["chat"]
 
 [[permission]]
 identifier = "deny-chat"
-description = "Denies the chat command."
+description = "Denies the chat command without any pre-configured scope."
 commands.deny = ["chat"]

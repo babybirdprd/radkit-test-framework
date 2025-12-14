@@ -4,10 +4,10 @@
 
 [[permission]]
 identifier = "allow-submit-tool-output"
-description = "Enables the submit_tool_output command."
+description = "Enables the submit_tool_output command without any pre-configured scope."
 commands.allow = ["submit_tool_output"]
 
 [[permission]]
 identifier = "deny-submit-tool-output"
-description = "Denies the submit_tool_output command."
+description = "Denies the submit_tool_output command without any pre-configured scope."
 commands.deny = ["submit_tool_output"]

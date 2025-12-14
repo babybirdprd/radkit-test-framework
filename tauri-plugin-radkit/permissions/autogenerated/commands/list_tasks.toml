@@ -4,10 +4,10 @@
 
 [[permission]]
 identifier = "allow-list-tasks"
-description = "Enables the list_tasks command."
+description = "Enables the list_tasks command without any pre-configured scope."
 commands.allow = ["list_tasks"]
 
 [[permission]]
 identifier = "deny-list-tasks"
-description = "Denies the list_tasks command."
+description = "Denies the list_tasks command without any pre-configured scope."
 commands.deny = ["list_tasks"]
