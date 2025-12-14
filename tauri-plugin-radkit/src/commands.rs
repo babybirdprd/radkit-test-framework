@@ -5,7 +5,7 @@ use crate::frontend_tool::FrontendTool;
 use crate::chat_skill::ChatSkill;
 
 use radkit::agent::Agent;
-use radkit::runtime::{Runtime, RuntimeBuilder};
+use radkit::runtime::{Runtime, RuntimeBuilder, AgentRuntime};
 use radkit::models::providers::{
     OpenAILlm, AnthropicLlm, GeminiLlm, OpenRouterLlm, GrokLlm, DeepSeekLlm
 };
@@ -65,7 +65,6 @@ pub async fn init_agent<R: TauriRuntime>(
             if let Some(c) = common {
                 if let Some(mt) = c.max_tokens { llm = llm.with_max_tokens(mt); }
                 if let Some(temp) = c.temperature { llm = llm.with_temperature(temp); }
-                if let Some(p) = c.top_p { llm = llm.with_top_p(p); }
             }
             Arc::new(llm)
         },
@@ -78,7 +77,6 @@ pub async fn init_agent<R: TauriRuntime>(
             if let Some(c) = common {
                 if let Some(mt) = c.max_tokens { llm = llm.with_max_tokens(mt); }
                 if let Some(temp) = c.temperature { llm = llm.with_temperature(temp); }
-                 if let Some(p) = c.top_p { llm = llm.with_top_p(p); }
             }
             Arc::new(llm)
         },
@@ -91,7 +89,6 @@ pub async fn init_agent<R: TauriRuntime>(
              if let Some(c) = common {
                 if let Some(mt) = c.max_tokens { llm = llm.with_max_tokens(mt); }
                 if let Some(temp) = c.temperature { llm = llm.with_temperature(temp); }
-                if let Some(p) = c.top_p { llm = llm.with_top_p(p); }
             }
             Arc::new(llm)
         },
@@ -119,7 +116,6 @@ pub async fn init_agent<R: TauriRuntime>(
              if let Some(c) = common {
                 if let Some(mt) = c.max_tokens { llm = llm.with_max_tokens(mt); }
                 if let Some(temp) = c.temperature { llm = llm.with_temperature(temp); }
-                 if let Some(p) = c.top_p { llm = llm.with_top_p(p); }
             }
             Arc::new(llm)
         },
@@ -132,7 +128,6 @@ pub async fn init_agent<R: TauriRuntime>(
              if let Some(c) = common {
                 if let Some(mt) = c.max_tokens { llm = llm.with_max_tokens(mt); }
                 if let Some(temp) = c.temperature { llm = llm.with_temperature(temp); }
-                 if let Some(p) = c.top_p { llm = llm.with_top_p(p); }
             }
             Arc::new(llm)
         },
@@ -307,8 +302,8 @@ pub async fn search_memory(
     };
 
     let options = SearchOptions {
-        limit: request.limit.unwrap_or(10),
-        min_score: request.min_score.unwrap_or(0.0),
+        limit: Some(request.limit.unwrap_or(10)),
+        min_score: Some(request.min_score.unwrap_or(0.0)),
         ..Default::default()
     };
 
@@ -316,9 +311,9 @@ pub async fn search_memory(
 
     Ok(results.into_iter().map(|e| MemoryEntryResult {
         id: e.id,
-        text: e.content,
+        text: e.text,
         score: e.score,
-        metadata: e.metadata,
+        metadata: serde_json::to_value(e.metadata).unwrap_or(serde_json::Value::Null),
     }).collect())
 }
 
@@ -334,10 +329,14 @@ pub async fn save_memory(
         user_name: "user".into(),
     };
 
+    let metadata: std::collections::HashMap<String, serde_json::Value> = request.metadata
+        .and_then(|v| serde_json::from_value(v).ok())
+        .unwrap_or_default();
+
     let content = MemoryContent {
-        content: request.text,
-        source: request.source_id,
-        metadata: request.metadata,
+        text: request.text,
+        source: radkit::runtime::memory::ContentSource::UserFact { category: request.source_id },
+        metadata,
     };
 
     let id = memory.add(&auth, content).await.map_err(|e| e.to_string())?;
@@ -377,7 +376,9 @@ pub async fn get_task(
 ) -> Result<serde_json::Value, String> {
     let client = get_client(&state)?;
     let params = TaskQueryParams {
-         task_id: request.task_id,
+         id: request.task_id,
+         history_length: None,
+         metadata: None,
     };
     let task = client.get_task(params).await.map_err(|e| e.to_string())?;
     Ok(serde_json::to_value(task).map_err(|e| e.to_string())?)
@@ -390,7 +391,8 @@ pub async fn cancel_task(
 ) -> Result<serde_json::Value, String> {
     let client = get_client(&state)?;
     let params = TaskIdParams {
-         task_id: request.task_id,
+         id: request.task_id,
+         metadata: None,
     };
     let task = client.cancel_task(params).await.map_err(|e| e.to_string())?;
     Ok(serde_json::to_value(task).map_err(|e| e.to_string())?)
