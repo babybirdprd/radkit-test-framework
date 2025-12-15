@@ -90,11 +90,22 @@ pub struct ChatResponse {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SourceType {
+    PastConversation,
+    UserFact,
+    Document,
+    External,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchMemoryRequest {
     pub query: String,
     pub limit: Option<usize>,
     pub min_score: Option<f32>,
+    pub source_types: Option<Vec<SourceType>>,
+    pub metadata_filter: Option<Value>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -117,6 +128,7 @@ pub struct MemoryEntryResult {
     pub id: String,
     pub text: String,
     pub score: f32,
+    pub source: Value,
     pub metadata: Value,
 }
 

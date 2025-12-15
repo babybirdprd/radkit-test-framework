@@ -21,9 +21,9 @@ chrono = { version = "0.4", features = ["serde"] }
 reqwest = { version = "0.12", features = ["json"] }
 
 # Radkit dependencies
-radkit = { git = "https://github.com/agents-sh/radkit.git", features = ["runtime", "openapi", "mcp"] }
-a2a-types = { git = "https://github.com/agents-sh/radkit.git" }
-a2a-client = { git = "https://github.com/agents-sh/radkit.git" }
+radkit = { version = "0.0.4", features = ["runtime", "openapi", "mcp"] }
+a2a-types = "0.1.3"
+a2a-client = "0.1.2"
 
 [build-dependencies]
 tauri-plugin = { version = "2", features = ["build"] }

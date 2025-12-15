@@ -5,7 +5,8 @@ version = 4
 [[package]]
 name = "a2a-client"
 version = "0.1.2"
-source = "git+https://github.com/agents-sh/radkit.git#672f81042c6f5cad0ff43022487fafcabb14f4b6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81008cdf77ac2e1daefa2a4c828b73a4a2f70bdb68edfdd2f710a607b58636b2"
 dependencies = [
  "a2a-types",
  "bytes",
@@ -25,7 +26,8 @@ dependencies = [
 [[package]]
 name = "a2a-types"
 version = "0.1.3"
-source = "git+https://github.com/agents-sh/radkit.git#672f81042c6f5cad0ff43022487fafcabb14f4b6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02e05f443013a7902f12a237ae3b876014a9b2e8a44ed03b83e62dab5e6fabc2"
 dependencies = [
  "serde",
  "serde_json",
@@ -3269,8 +3271,9 @@ checksum = "69cdb34c158ceb288df11e18b4bd39de994f6657d83847bdffdbd7f346754b0f"
 
 [[package]]
 name = "radkit"
-version = "0.0.3"
-source = "git+https://github.com/agents-sh/radkit.git#672f81042c6f5cad0ff43022487fafcabb14f4b6"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "204082b4f956ae9c72bbdf5b2afcb0212fc7b467e4c2e8090f0deb78dedc7b28"
 dependencies = [
  "a2a-client",
  "a2a-types",
@@ -3307,7 +3310,8 @@ dependencies = [
 [[package]]
 name = "radkit-macros"
 version = "0.0.2"
-source = "git+https://github.com/agents-sh/radkit.git#672f81042c6f5cad0ff43022487fafcabb14f4b6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc62f44bdd69487629229fbc693af6dd148ef662c45ce1612c699af001c93900"
 dependencies = [
  "proc-macro2",
  "quote",
