@@ -21,7 +21,6 @@ use a2a_client::A2AClient;
 use std::sync::Arc;
 use std::time::Duration;
 use futures::StreamExt;
-use serde_json::Value;
 
 struct DynamicLlm(Arc<dyn radkit::models::BaseLlm>);
 
