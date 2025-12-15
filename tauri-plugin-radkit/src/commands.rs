@@ -21,6 +21,7 @@ use a2a_client::A2AClient;
 use std::sync::Arc;
 use std::time::Duration;
 use futures::StreamExt;
+use serde_json::Value;
 
 struct DynamicLlm(Arc<dyn radkit::models::BaseLlm>);
 
@@ -300,10 +301,25 @@ pub async fn search_memory(
         user_name: "user".into(),
     };
 
+    let source_types = request.source_types.map(|types| {
+        types.into_iter().map(|t| match t {
+            SourceType::PastConversation => radkit::runtime::memory::SourceType::PastConversation,
+            SourceType::UserFact => radkit::runtime::memory::SourceType::UserFact,
+            SourceType::Document => radkit::runtime::memory::SourceType::Document,
+            SourceType::External => radkit::runtime::memory::SourceType::External,
+        }).collect()
+    });
+
+    let metadata_filter: Option<std::collections::HashMap<String, Value>> = match request.metadata_filter {
+        Some(val) => Some(serde_json::from_value(val).map_err(|e| e.to_string())?),
+        None => None,
+    };
+
     let options = SearchOptions {
         limit: Some(request.limit.unwrap_or(10)),
         min_score: Some(request.min_score.unwrap_or(0.0)),
-        ..Default::default()
+        source_types,
+        metadata_filter,
     };
 
     let results = memory.search(&auth, &request.query, options).await.map_err(|e| e.to_string())?;
@@ -312,7 +328,8 @@ pub async fn search_memory(
         id: e.id,
         text: e.text,
         score: e.score,
-        metadata: serde_json::to_value(e.metadata).unwrap_or(serde_json::Value::Null),
+        source: serde_json::to_value(e.source).unwrap_or(Value::Null),
+        metadata: serde_json::to_value(e.metadata).unwrap_or(Value::Null),
     }).collect())
 }
 

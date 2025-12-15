@@ -27,10 +27,13 @@ export interface InitAgentRequest {
   tools: ToolDefinition[];
 }
 
+export type SourceType = "past_conversation" | "user_fact" | "document" | "external";
+
 export interface MemoryEntryResult {
     id: string;
     text: string;
     score: number;
+    source: any;
     metadata: any;
 }
 
@@ -38,6 +41,8 @@ export interface SearchMemoryRequest {
     query: string;
     limit?: number;
     minScore?: number;
+    sourceTypes?: SourceType[];
+    metadataFilter?: any;
 }
 
 export interface SaveMemoryRequest {
